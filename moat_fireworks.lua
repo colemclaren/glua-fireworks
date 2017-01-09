@@ -11,10 +11,10 @@ mf.size = 6
 mf.particlesize = 2
 mf.explosionsize = 150
 
-function mf.newfirework(p, x, y)
+function mf.newfirework(p, x, y, peak)
     local firework = {}
     firework.pos = {x, y, {}}
-    firework.peak = math.Rand(mf.peak.min, mf.peak.max)
+    firework.peak = peak or math.Rand(mf.peak.min, mf.peak.max)
     firework.particlesize = math.random(40, mf.explosionsize)
     firework.particlenum = firework.particlesize
     firework.particles = {}
