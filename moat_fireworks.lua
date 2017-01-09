@@ -1,7 +1,3 @@
-
---Ripped from https://github.com/moat7/moat-fireworks/blob/master/moat_fireworks.lua
-
-
 moat_fireworks = moat_fireworks or {}
 local mf = moat_fireworks
 mf.peak = {min = 2, max = 5}
