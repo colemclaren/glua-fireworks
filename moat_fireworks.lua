@@ -1,6 +1,9 @@
-moat_fireworks = {}
+
+--Ripped from https://github.com/moat7/moat-fireworks/blob/master/moat_fireworks.lua
+
+
+moat_fireworks = moat_fireworks or {}
 local mf = moat_fireworks
-mf.fireworks = {}
 mf.peak = {min = 2, max = 5}
 mf.particlepeak = {min = -40, max = 40}
 mf.fireworkamt = {min = 70, max = 100}
@@ -11,16 +14,16 @@ mf.size = 6
 mf.particlesize = 2
 mf.explosionsize = 150
 
-function mf.newfirework(p, x, y)
+function mf.newfirework(p, x, y, peak)
     local firework = {}
     firework.pos = {x, y, {}}
-    firework.peak = math.Rand(mf.peak.min, mf.peak.max)
+    firework.peak = peak or math.Rand(mf.peak.min, mf.peak.max)
     firework.particlesize = math.random(40, mf.explosionsize)
     firework.particlenum = firework.particlesize
     firework.particles = {}
     firework.color = HSVToColor(math.random(360), 1, 1)
     firework.peaked = false
-    table.insert(mf.fireworks, firework)
+    table.insert(p.fireworks, firework)
 end
 
 function mf.newparticle(f, x, y)
@@ -31,21 +34,19 @@ function mf.newparticle(f, x, y)
     table.insert(f.particles, particle)
 end
 
-mf.frame = vgui.Create("DFrame")
-mf.frame:SetSize(1000, 800)
-mf.frame:Center()
-mf.frame:MakePopup()
-mf.frame:SetTitle("Firework Test")
-mf.panel = vgui.Create("DPanel", mf.frame)
-mf.panel:Dock(FILL)
-mf.panel.tall = mf.panel:GetTall()
-mf.panel.wide = mf.panel:GetWide()
+
+mf.panel = {}
+
+AccessorFunc(mf.panel,"BackgroundColor","BackgroundColor")
+mf.panel.Init = function(s)
+	s.fireworks = {}
+end
 
 mf.panel.Paint = function(s, w, h)
-    surface.SetDrawColor(51, 51, 51)
+    surface.SetDrawColor(s:GetBackgroundColor())
     surface.DrawRect(0, 0, w, h)
 
-    for k, v in pairs(mf.fireworks) do
+    for k, v in pairs(s.fireworks) do
         if (not v.peaked) then
             draw.RoundedBox(mf.size / 2, v.pos[1], v.pos[2], mf.size, mf.size, v.color)
         else
@@ -59,13 +60,13 @@ mf.panel.Paint = function(s, w, h)
 end
 
 mf.panel.Think = function(s)
-    if (math.random(0, 100) < 0.01 and #mf.fireworks <= 5) then
+    if (math.random(0, 100) < 0.01 and #s.fireworks <= 5) then
         mf.newfirework(s, math.random(0, s:GetWide()), s:GetTall() + 5)
     end
 
-    for k, v in pairs(mf.fireworks) do
+    for k, v in pairs(s.fireworks) do
         if (v.color.a < 0) then
-            table.remove(mf.fireworks, k)
+            s.fireworks[k] = nil
             continue
         end
 
@@ -103,3 +104,4 @@ mf.panel.Think = function(s)
         end
     end
 end
+vgui.Register(mf.panel,"moat_fireworks","Panel")
